@@ -214,34 +214,133 @@ import matplotlib.pyplot as plt
 plt.plot(*zip(*sorted(array.items())))
 plt.show()
 
+### SkewArray Function 
+
+def SkewArray(Genome):
+    skew = [0]
+    score = {"A":0, "T":0, "C":-1, "G":1}
+    for i in range(1,len(Genome)+1):
+            skew.append(score[Genome[i-1]] + skew[i-1])
+    return skew
+
+
+## Finding the ORI Region with the minimum values outputed
+
+def SkewArray(Genome):
+    array = [0]
+    Skew = 0
+    for i in Genome:
+        if i == 'A' or i == 'T':
+            Skew += 0
+            array.append(Skew)
+        if i == 'C':
+            Skew -= 1
+            array.append(Skew)
+        if i == 'G':
+            Skew += 1
+            array.append(Skew)
+    return array
+
+def MinimumSkew(Genome):
+    array = SkewArray(Genome)
+    positions = []
+    count = 0
+    minarray = min(array)
+    for i in array:
+        if i == minarray:
+            positions.append(count)
+        count +=1
+    return positions
+
+### Find distance between two strings
+
+def HammingDistance (p, q):
+    count = 0
+    for i, j in zip(p, q):
+       if i != j:
+           count += 1
+    return count
+
+
+### AproximatePatternMatching
+
+def ApproximatePatternMatching(Text, Pattern, d):
+    positions = [] # initializing list of positions
+    for i in range(len(Text)-len(Pattern)+1):
+        if HammingDistance(Text[i:i+len(Pattern)], Pattern) <= d:
+            positions.append(i)
+    return positions
+#range is modified like this because if is it just length of the bigger text, pattern will keep sliding along with empty letters, adding more to the list of positions
+
+def HammingDistance(p, q):
+    count = 0
+    for i in range(len(p)):
+        if p[i] != q[i]:
+            count += 1
+    return count
+
+### Approximate Pattern Count
+
+def ApproximatePatternCount(Pattern, Text, d):
+    count = 0 # initialize count variable
+    for i in range(len(Text)-len(Pattern)+1):
+        if HammingDistance(Pattern, Text[i:i+len(Pattern)]) <= d:
+            count += 1
+    return count
+#same thing as the pattern matching before, but it is replaced by count
+
+def HammingDistance(p, q):
+    count = 0
+    for i in range(len(p)):
+        if p[i] != q[i]:
+            count += 1
+    return count
+
+### DO NOT MODIFY THE CODE BELOW THIS LINE ###
+import sys
+lines = sys.stdin.read().splitlines()
+print(ApproximatePatternCount(lines[0],lines[1],int(lines[2])))
+
+#here is my pattern matching for reference. range is set like that because it will continue matching with the empty letters at the end of the long text
+
+def ApproximatePatternMatching(Text, Pattern, d):
+    positions = [] # initializing list of positions
+    for i in range(len(Text)-len(Pattern)+1):
+        if HammingDistance(Text[i:i+len(Pattern)], Pattern) <= d:
+            positions.append(i)
+    return positions
+
+
 '''
 
 # Run Code Here #
 
-def PatternCount(Pattern, Text):
-    count = 0
-    for i in range(len(Text)-len(Pattern)+1):
-        if Text[i:i+len(Pattern)] == Pattern:
-            count = count+1
-    return count 
-
-def FasterSymbolArray(Genome, symbol):
-    array = {}
-    n = len(Genome)
-    ExtendedGenome = Genome + Genome[0:n//2]
-
-    # look at the first half of Genome to compute first array value
-    array[0] = PatternCount(symbol, Genome[0:n//2])
-
-    for i in range(1, n):
-        # start by setting the current array value equal to the previous array value
-        array[i] = array[i-1]
-
-        # the current array value can differ from the previous array value by at most 1
-        if ExtendedGenome[i-1] == symbol:
-            array[i] = array[i]-1
-        if ExtendedGenome[i+(n//2)-1] == symbol:
-            array[i] = array[i]+1
+def SkewArray(Genome):
+    array = [0]
+    Skew = 0
+    for i in Genome:
+        if i == 'A' or i == 'T':
+            Skew += 0
+            array.append(Skew)
+        if i == 'C':
+            Skew -= 1
+            array.append(Skew)
+        if i == 'G':
+            Skew += 1
+            array.append(Skew)
     return array
+
+def MinimumSkew(Genome):
+    array = SkewArray(Genome)
+    positions = []
+    count = 0
+    minarray = min(array)
+    for i in array:
+        if i == minarray:
+            positions.append(count)
+        count +=1
+    return positions
+
+print(MinimumSkew('GATACACTTCCCGAGTAGGTACTG'))
 
 # End Code #
