@@ -130,7 +130,7 @@ def PatternMatching(Pattern, Genome):
 
 print(PatternMatching('ATAT', 'GATATATGCATATACTT')) 
 
-#### Find frequency of a certain nucleotoide in a window
+#### Find frequency of a certain nucleotide in a window
 #### of half the genome's size
 
 def PatternCount(Pattern, Text):
@@ -176,7 +176,7 @@ def FasterSymbolArray(Genome, symbol):
             array[i] = array[i]+1
     return array
 
-#### Code to show a plot for a nucleotoide's occurence in the genome with a window of length n//2
+#### Code to show a plot for a nucleotide's occurence in the genome with a window of length n//2
 
 def PatternCount(Pattern, Text):
     count = 0
@@ -310,37 +310,447 @@ def ApproximatePatternMatching(Text, Pattern, d):
             positions.append(i)
     return positions
 
+### Frequent Words with Mismatches Problem
+    Possible Solution:
+        Use the sliding window technique and slipt each sliding window into single characters,
+        then she how often the certain characters are in each window.
+
+
+##### Motifs.py #####
+### Count
+def Count(Motifs):
+    count = {}
+    ## k - Length of kmer/window
+    k = len(Motifs[0])
+    for symbol in "ACGT":
+        count[symbol] = []
+        for j in range(k):
+            count[symbol].append(0)
+    
+    t = len(Motifs)
+    for i in range(t):
+        for j in range(k):
+            symbol = Motifs[i][j]
+            count[symbol][j] +=1
+
+    return count
+
+### Profile (requires Count function)
+
+def Count(Motifs):
+    count = {}
+    ## k - Length of kmer/window
+    k = len(Motifs[0])
+    for symbol in "ACGT":
+        count[symbol] = []
+        for j in range(k):
+            count[symbol].append(0)
+    
+    t = len(Motifs)
+    for i in range(t):
+        for j in range(k):
+            symbol = Motifs[i][j]
+            count[symbol][j] +=1
+
+    return count
+
+
+def Profile(Motifs):
+    t = len(Motifs)
+    k = len(Motifs[0])
+    profile = Count(Motifs)
+    
+    for key,v in profile.items():
+        v[:] = [x / t for x in v]
+    return profile
+
+### Consensus
+def Count(Motifs):
+    count = {}
+    ## k - Length of kmer/window
+    k = len(Motifs[0])
+    for symbol in "ACGT":
+        count[symbol] = []
+        for j in range(k):
+            count[symbol].append(0)
+    
+    t = len(Motifs)
+    for i in range(t):
+        for j in range(k):
+            symbol = Motifs[i][j]
+            count[symbol][j] +=1
+
+    return count
+
+def Consensus(Motifs):
+    k = len(Motifs[0])
+    count = Count(Motifs)
+
+    consensus = ''
+
+    for j in range(k):
+        m = 0
+        frequentSymbol = ''
+        for symbol in 'ACGT':
+            if count[symbol][j] > m:
+                m = count[symbol][j]
+                frequentSymbol = symbol
+        consensus += frequentSymbol
+    return consensus
+
+### Score
+def Count(Motifs):
+    count = {}
+    ## k - Length of kmer/window
+    k = len(Motifs[0])
+    for symbol in "ACGT":
+        count[symbol] = []
+        for j in range(k):
+            count[symbol].append(0)
+    
+    t = len(Motifs)
+    for i in range(t):
+        for j in range(k):
+            symbol = Motifs[i][j]
+            count[symbol][j] +=1
+
+    return count
+
+def Consensus(Motifs):
+    k = len(Motifs[0])
+    count = Count(Motifs)
+
+    consensus = ''
+
+    for j in range(k):
+        m = 0
+        frequentSymbol = ''
+        for symbol in 'ACGT':
+            if count[symbol][j] > m:
+                m = count[symbol][j]
+                frequentSymbol = symbol
+        consensus += frequentSymbol
+    return consensus
+
+def Score(Motifs):
+    consensus = Consensus(Motifs)
+    count = 0
+    for motif in Motifs:
+        for index in range(len(motif)):
+            if motif[index] != consensus[index]:
+                count += 1
+    return count
+
+### Probability
+
+def Pr(Text, Profile):
+    product = 1
+    for index, nucleotide in enumerate(Text):
+        product *= Profile[nucleotide][index]
+    return product
+
+### 
+def ProfileMostProbableKmer(text, k, profile):
+    n = len(text)
+    pr = {}
+    most_likely_kmer = []
+    for i in range(n-k+1):
+        k_mer = text[i:i+k]
+        probability = Pr(k_mer, profile)
+        pr[k_mer] = probability
+    m = max(pr.values())
+    for key, value in pr.items():
+        if pr[key] == m:
+            most_likely_kmer.append(key)
+    return most_likely_kmer[0]
+
+def Pr(Text, Profile):
+    product = 1
+    for index, nucleotide in enumerate(Text):
+        product *= Profile[nucleotide][index]
+    return product
+
+### Greedy Motif Search
+def Count(Motifs):
+    k = len(Motifs[0])
+    count = {}
+    for symbol in "ACGT":
+        count[symbol] = []
+        for j in range(k):
+            count[symbol].append(0)
+    t = len(Motifs)
+    for i in range(t):
+        for j in range(k):
+            symbol = Motifs[i][j]
+            count[symbol][j] += 1
+    return count
+
+
+def Consensus(Motifs):
+    count = Count(Motifs)
+    k = len(Motifs[0])
+    consensus = ""
+    for j in range(k):
+        m = 0
+        frequentSymbol = ""
+        for symbol in "ACGT":
+            if count[symbol][j] > m:
+                m = count[symbol][j]
+                frequentSymbol = symbol
+        consensus += frequentSymbol
+    return consensus
+
+
+def Profile(Motifs):
+    t = len(Motifs)
+    k = len(Motifs[0])
+    profile = Count(Motifs)
+    for i in 'ACTG':
+        for j in range(k):
+            profile[i][j] = profile[i][j]/t  
+    return profile
+
+def Score(Motifs):
+    k = len(Motifs[0])
+    score = 0
+    count = Count(Motifs)
+    max_symbol = Consensus(Motifs)
+    sum1 = 0
+    for j in range(k):
+        m = 0
+        for symbol in "ATCG":
+            if count[symbol][j] > m:
+                sum1 += count[symbol][j]
+    for j in range(k):
+        m = 0
+        for symbol in "AGTC":
+            if count[symbol][j] > m:
+                m = count[symbol][j]
+        score += m  
+    return sum1-score
+
+
+
+
+def Pr(Text, Profile):
+    k = len(Profile["A"])
+    p=1
+    for i in range(len(Text)):
+        p=p*Profile[Text[i]][i]
+    return p
+
+def ProfileMostProbablePattern(text,k,profile):
+    p=-1
+    result=text[0:k]
+    for i in range(len(text)-k+1):
+        seq=text[i:i+k]
+        pr=Pr(seq,profile)
+        if pr>p:
+            p=pr
+            result=seq
+    return result
+
+def GreedyMotifSearch(Dna,k,t):
+    BestMotifs = []
+    for i in range(0, t):
+        BestMotifs.append(Dna[i][0:k])
+    n = len(Dna[0])
+    for m in range(n-k+1):
+        Motifs = []
+        Motifs.append(Dna[0][m:m+k])
+        for j in range(1, t):
+            P = Profile(Motifs[0:j])
+            Motifs.append(ProfileMostProbablePattern(Dna[j], k, P))
+        if Score(Motifs) < Score(BestMotifs):
+            BestMotifs = Motifs
+    return BestMotifs
+
+### Big DNA set
+
+def Count(Motifs):
+
+    count = {}
+
+    k = len(Motifs[0])
+
+    for symbol in "ACGT":
+
+        count[symbol] = []
+
+        for j in range(k):
+
+            count[symbol].append(0)
+
+    t = len(Motifs)
+
+    for i in range(t):
+
+        for j in range(k):
+
+            symbol = Motifs[i][j]
+
+            count[symbol][j] += 1
+
+    return count
+
+ 
+
+def Consensus(Motifs):
+
+  
+
+    k = len(Motifs[0])
+
+    count = Count(Motifs)
+
+    consensus = ""
+
+    for j in range(k):
+
+        m = 0
+
+        frequentSymbol = ""
+
+        for symbol in "ACGT":
+
+            if count[symbol][j] > m:
+
+                m = count[symbol][j]
+
+                frequentSymbol = symbol
+
+        consensus += frequentSymbol
+
+    return consensus
+
+ 
+
+def Profile(Motifs):
+
+    t = len(Motifs)
+
+    k = len(Motifs[0])
+
+    profile = Count(Motifs)
+
+    for i in 'ACTG':
+
+        for j in range(k):
+
+            profile[i][j] = profile[i][j]/t  
+
+    return profile
+
+ 
+
+def Score(Motifs):
+
+    # Insert code here
+
+    score = 0
+
+    k = len(Motifs[0])
+
+    count = Count(Motifs)
+
+    max_symbol = Consensus(Motifs)
+
+    sum1 = 0
+
+    for j in range(k):
+
+        m = 0
+
+        for symbol in "ATCG":
+
+            if count[symbol][j] > m:
+
+                sum1 += count[symbol][j]
+
+    for j in range(k):
+
+        m = 0
+
+        for symbol in "AGTC":
+
+            if count[symbol][j] > m:
+
+                m = count[symbol][j]
+
+        score += m  
+
+    return sum1-score
+
+ 
+
+def Pr(Text, Profile):
+
+    p=1
+
+    k = len(Profile["A"])
+
+    for i in range(len(Text)):
+
+        p=p*Profile[Text[i]][i]
+
+    return p
+
+ 
+
+#Finally solved it
+
+def ProfileMostProbablePattern(text,k,profile):
+
+    p=-1
+
+    result=text[0:k]
+
+    for i in range(len(text)-k+1):
+
+        seq=text[i:i+k]
+
+        pr=Pr(seq,profile)
+
+        if pr>p:
+
+            p=pr
+
+            result=seq
+
+    return result
+
+ 
+
+def GreedyMotifSearch(Dna,k,t):
+
+    BestMotifs = []
+
+    for i in range(0, t):
+
+        BestMotifs.append(Dna[i][0:k])
+
+    n = len(Dna[0])
+
+    for m in range(n-k+1):
+
+        Motifs = []
+
+        Motifs.append(Dna[0][m:m+k])
+
+        for j in range(1, t):
+
+            P = Profile(Motifs[0:j])
+
+            Motifs.append(ProfileMostProbablePattern(Dna[j], k, P))
+
+        if Score(Motifs) < Score(BestMotifs):
+
+            BestMotifs = Motifs
+
+    return BestMotifs
 
 '''
 
 # Run Code Here #
-
-def SkewArray(Genome):
-    array = [0]
-    Skew = 0
-    for i in Genome:
-        if i == 'A' or i == 'T':
-            Skew += 0
-            array.append(Skew)
-        if i == 'C':
-            Skew -= 1
-            array.append(Skew)
-        if i == 'G':
-            Skew += 1
-            array.append(Skew)
-    return array
-
-def MinimumSkew(Genome):
-    array = SkewArray(Genome)
-    positions = []
-    count = 0
-    minarray = min(array)
-    for i in array:
-        if i == minarray:
-            positions.append(count)
-        count +=1
-    return positions
-
-print(MinimumSkew('GATACACTTCCCGAGTAGGTACTG'))
 
 # End Code #
